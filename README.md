@@ -52,24 +52,80 @@ For 90% of consumers, just `begeniux` + `begeniux/server` is the canonical setup
 
 ---
 
-## Why this exists
+## Why behavioral UI?
+
+### The UX cycle is slow
+
+Every product UI ships the same way today:
+
+1. Research, interviews, surveys
+2. Mocks, design reviews, committees
+3. Ship one UI to everyone
+4. A/B test, iterate over weeks → months
+
+This loop is slow because it optimizes the **average** user. Every individual gets the same UI. The signal you act on is aggregate; the time-to-respond is sprints. Power users wait through hand-holding they don't need; struggling users churn before help arrives.
+
+### Behavioral UI flips it
+
+Drop begeniux into your existing app and the loop becomes:
+
+1. The library tracks **any** user behavior — clicks, dwell, scroll, hovers, focus, form interactions, errors, rage clicks, custom events
+2. A LangGraph agent (running OpenAI / Gemini / Claude — your pick) reasons over the signal in real time
+3. The UI re-shapes itself live — density, accent color, microcopy, emphasis — within the **design system you declare**
+4. Each user sees a UI tuned to them, evolving across the session
+
+Personalization happens **during the session**, not in the next sprint. No variants to pre-build. No design committee. No statistical significance to wait for.
+
+### What makes "behavioral" the right word
+
+We picked the term deliberately. Adjacent framings each miss something:
+
+| Term | What it implies | Why it's wrong here |
+|---|---|---|
+| Adaptive UI | Conflates rule-based and ML systems; academic baggage from the SUPPLE era | Doesn't name the input modality |
+| Generative UI | Implies the LLM generates UI from scratch (Vercel AI SDK style) | Assumes prompt-driven, not observation-driven |
+| Agentic UI | Names the policy but not what feeds it | Doesn't tell you the input is *behavior* |
+
+**Behavioral UI** is precise: the input is observed user behavior — the cheapest, most honest signal a digital product has. Until LLMs, nobody could read it well enough to act on it in real time.
+
+### Why now
+
+Adaptive-UI research is 30+ years old. SUPPLE (2004) showed UIs could regenerate per user. Contextual bandits (2010) showed online learning could pick layouts. Implicit-feedback work (2005) showed clicks already encode preference. None of this shipped at scale because:
+
+- **Hand-coded rules** couldn't keep up with combinatorics
+- **Shallow ML** needed massive population traffic to converge — too slow for one session
+- **A/B tests** optimize populations, not individuals — the wrong granularity
+
+In-context learning (GPT-3 onward) cracked it. An LLM can reason from a handful of behavioral signals to a sensible UI choice **without training, without traffic, in one session**. That's the unlock.
+
+### The five pieces, combined
 
 ```mermaid
 flowchart LR
   subgraph Trad["Today's generative UI"]
     direction LR
-    P["💬 Prompt"] --> M1["LLM"] --> U1["Generated UI"]
+    P["💬 Prompt"] --> M1["LLM"] --> U1["Generated UI<br/>from scratch"]
   end
-  subgraph Be["BeGeniux"]
+  subgraph Be["Behavioral UI · begeniux"]
     direction LR
-    B["🖱️ Behavioral trace<br/>clicks · dwell · scroll · hover<br/>focus · input · errors · rage clicks"] --> M2["Agent<br/>(your LangGraph)"] --> U2["Live DOM mutation<br/>session-granular"]
+    B["🖱️ Behavioral trace<br/>clicks · dwell · scroll<br/>hover · focus · errors · rage"] --> M2["LLM agent<br/>(LangGraph)"] --> U2["Live DOM mutation<br/>of your existing UI<br/>session-granular"]
   end
   Trad ~~~ Be
 ```
 
-> Most generative UI today reacts to *prompts*. begeniux reacts to *behavioral traces*. The contribution is the combination: **interaction traces as the input modality**, **LLM agents as the policy** (not hand-coded rules), **session-granularity adaptation** (not population A/B tests), and **mutation of the existing UI** (not replacement of pre-built variants) — under developer-declared design-system invariants that keep the agent honest.
+The contribution is the **combination of five ideas** that have not been combined in production before:
 
-The first three are 2024+ technology that finally make 30 years of adaptive UI research tractable. The fourth is what makes it *drop-in*.
+1. **Interaction traces as the input modality** (not text prompts)
+2. **LLM agents as the policy** (not hand-coded rules, not shallow classifiers)
+3. **Session-granularity adaptation** (not population-level A/B)
+4. **Mutation of the existing UI** (not replacement of pre-built variants — drop-in install)
+5. **Developer-declared design-system invariants** (the agent is bounded — it can only speak the vocabulary of CSS variables and classes you expose)
+
+The first three are 2024+ technology. The fourth is what makes it drop-in. The fifth is what makes it safe.
+
+### The runnable proof
+
+[`examples/with-nextjs/`](./examples/with-nextjs/) is a tiny e-commerce surface where you can watch all of this fire end-to-end: search, hover, rage-click — the agent reasons over the trace, calls `apply_adaptations`, and the UI density / accent / emphasis shifts in real time. The sticky telemetry strip at the bottom shows you exactly what the agent decided and why, every time it runs.
 
 ---
 
