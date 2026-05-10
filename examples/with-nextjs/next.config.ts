@@ -1,10 +1,17 @@
 import type { NextConfig } from "next";
 import path from "node:path";
 
+// Resolve `begeniux` and `begeniux/server` to the local repo source so
+// this example always reflects the current library state. After
+// `npm install`, file:../.. also leaves a symlink at node_modules/begeniux,
+// so even without aliases the imports would resolve — but we want source
+// hot-reload, hence the explicit aliases below.
+//
+// Note: webpack accepts absolute paths in resolve.alias; Turbopack treats
+// absolute paths as server-relative and fails. So we use absolute for
+// webpack (`next build` / non-Turbo dev) and project-relative for Turbo.
+
 const config: NextConfig = {
-  // Resolve the local begeniux source at ../../src so this example tracks the
-  // current library state without an npm install. Real consumers just use
-  // `import { BeGenProvider } from "begeniux"` after `npm install begeniux`.
   webpack: (cfg) => {
     cfg.resolve = cfg.resolve ?? {};
     cfg.resolve.alias = {
@@ -16,8 +23,8 @@ const config: NextConfig = {
   },
   turbopack: {
     resolveAlias: {
-      begeniux: path.resolve(__dirname, "../../src/index.ts"),
-      "begeniux/server": path.resolve(__dirname, "../../src/server/index.ts"),
+      begeniux: "../../src/index.ts",
+      "begeniux/server": "../../src/server/index.ts",
     },
   },
 };

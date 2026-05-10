@@ -1,11 +1,25 @@
 @import "tailwindcss";
 
-/* Design tokens — these CSS variables ARE the agent's vocabulary. */
+/* ─── Design tokens ────────────────────────────────────────────────
+   These CSS variables ARE the agent's vocabulary. The agent can set
+   them on :root, swap classes, or set inline styles — within the
+   structural-property denylist (no display/position/overflow/etc).
+*/
 :root {
   --begen-accent: #7c3aed;
+  --begen-accent-soft: #a78bfa;
   --begen-density: 16px;
-  --begen-emphasis: "balanced";
   --begen-radius: 12px;
+  --begen-font-scale: 1;
+  --begen-cta-scale: 1;
+  --begen-card-bg: #18181b;
+  --begen-card-bg-hover: #1f1f24;
+  --begen-emphasis: "balanced";
+  --begen-muted-opacity: 0.6;
+}
+
+html {
+  font-size: calc(16px * var(--begen-font-scale));
 }
 
 body {
@@ -15,17 +29,127 @@ body {
   color: #f5f5f7;
 }
 
-/* Classes the agent can toggle. */
-.is-engaged main {
+/* ─── Adaptive classes the agent can toggle on the html element ───── */
+
+/* Decisive / fast user — tighten everything. */
+.is-engaged {
   --begen-density: 10px;
   --begen-radius: 6px;
+  --begen-cta-scale: 1.05;
 }
-.is-skimming main {
+.is-engaged .product-card {
+  background: #1c1c22;
+}
+.is-engaged .reviews-block {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  padding: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, max-height 200ms ease, margin-top 200ms ease, padding 200ms ease;
+}
+
+/* Slow / browsing user — give breathing room. */
+.is-skimming {
   --begen-density: 22px;
-  --begen-radius: 16px;
+  --begen-radius: 18px;
+  --begen-cta-scale: 0.95;
+  --begen-muted-opacity: 0.75;
 }
+.is-skimming .product-card {
+  background: #15151b;
+}
+
+/* Researching / comparing user — surface review content. */
+.is-comparing {
+  --begen-density: 20px;
+  --begen-radius: 14px;
+}
+.is-comparing .reviews-block {
+  opacity: 1;
+  max-height: 240px;
+  padding: 12px;
+  margin-top: 12px;
+  transition: opacity 250ms ease, max-height 250ms ease;
+}
+
+/* Frustrated user — emphasize CTA, add pulse. */
 .is-frustrated [data-begen-id="cta"] {
   --begen-accent: #ef4444;
+  --begen-cta-scale: 1.1;
   outline: 2px solid #fca5a5;
   outline-offset: 2px;
+  animation: cta-pulse 1.6s ease-in-out infinite;
+}
+.is-frustrated [data-begen-id="help-trigger"] {
+  --begen-accent: #ef4444;
+  outline: 2px solid #fca5a5;
+}
+
+@keyframes cta-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+/* ─── Reusable bits ────────────────────────────────────────────────── */
+.product-card {
+  background: var(--begen-card-bg);
+  padding: var(--begen-density);
+  border-radius: var(--begen-radius);
+  transition: background 200ms ease, padding 200ms ease, border-radius 200ms ease;
+}
+.product-card:hover {
+  background: var(--begen-card-bg-hover);
+}
+
+.cta {
+  background: var(--begen-accent);
+  color: white;
+  font-weight: 600;
+  padding: calc(var(--begen-density) * 0.6 * var(--begen-cta-scale))
+           calc(var(--begen-density) * var(--begen-cta-scale));
+  border-radius: var(--begen-radius);
+  border: 0;
+  cursor: pointer;
+  transition: background 200ms ease, padding 200ms ease, border-radius 200ms ease, transform 100ms ease, outline 200ms ease;
+  font-size: 1rem;
+}
+.cta:hover { transform: translateY(-1px); }
+.cta:active { transform: translateY(0); }
+.cta-secondary {
+  background: transparent;
+  color: var(--begen-accent-soft);
+  border: 1px solid var(--begen-accent-soft);
+}
+.cta-secondary:hover {
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.muted { opacity: var(--begen-muted-opacity); }
+
+.reviews-block {
+  opacity: 0.4;
+  max-height: 64px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: calc(var(--begen-radius) * 0.6);
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  transition: opacity 250ms ease, max-height 250ms ease, padding 250ms ease, margin-top 250ms ease;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.chip:hover { background: rgba(255, 255, 255, 0.1); }
+.chip[aria-pressed="true"] {
+  background: rgba(124, 58, 237, 0.18);
+  border-color: var(--begen-accent-soft);
 }
