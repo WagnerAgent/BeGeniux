@@ -1,11 +1,21 @@
 # begeniux
 
-**Drop-in adaptive UI engine. Tracks user behavior, asks an agent for a CSS-level adaptation plan, mutates the live DOM in real time.**
+**Drop-in adaptive UI engine. Tracks user behavior, an agent decides a CSS-level adaptation plan, the live DOM mutates in real time.**
 
 Today's UX cycle is slow: research → mock → ship → iterate. begeniux short-circuits it: install the library on an existing app, the agent observes how each user actually behaves, and the UI re-shapes itself live to match — accent colors, density, emphasis, microcopy. No variants pre-baked. No design committee. Personalization happens *during the session*.
 
+## Two packages, one product
+
+| Package | Where | What |
+|---|---|---|
+| **`begeniux`** | npm | React side — provider, behavior tracker, AdaptationEngine, CopilotKit adapter |
+| **`begeniux-langgraph`** | PyPI · [`agent/`](./agent) | Agent side — LangGraph node with the begeniux adaptive UI policy, runs Gemini or Claude |
+
+Both ship from this repo, versioned together. The agent isn't optional infrastructure — it's the brain. Install both for the canonical setup:
+
 ```bash
-npm install begeniux
+npm install begeniux                  # browser side
+pip install begeniux-langgraph        # agent side (or pip install "begeniux-langgraph[claude]")
 ```
 
 ```tsx
