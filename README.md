@@ -1,8 +1,43 @@
-# begeniux
+# BeGeniux
 
 **Drop-in adaptive UI engine. Tracks user behavior, an agent decides a CSS-level adaptation plan, the live DOM mutates in real time.**
 
-Today's UX cycle is slow: research → mock → ship → iterate. begeniux short-circuits it: install the library on an existing app, the agent observes how each user actually behaves, and the UI re-shapes itself live to match — accent colors, density, emphasis, microcopy. No variants pre-baked. No design committee. Personalization happens *during the session*.
+Today's UX cycle is slow: research → mock → ship → iterate. BeGeniux short-circuits it: install the library on an existing app, the agent observes how each user actually behaves, and the UI re-shapes itself live to match — accent colors, density, emphasis, microcopy. No variants pre-baked. No design committee. Personalization happens *during the session*.
+
+## Contents
+
+**Get started**
+1. [Install once, ship adaptive UI](#install-once-ship-adaptive-ui)
+2. [Packaging](#packaging)
+
+**Concept**
+3. [Why behavioral UI?](#why-behavioral-ui)
+
+**Architecture**
+4. [How it works](#how-it-works)
+5. [Where it fits in your stack](#where-it-fits-in-your-stack)
+6. [The contract](#the-contract)
+
+**Setup paths**
+7. [Quick start · CopilotKit + LangGraph](#quick-start-copilotkit--langgraph)
+8. [Quick start · HTTP, any backend](#quick-start-http--any-backend)
+9. [Quick start · no agent (heuristic / offline / demo)](#quick-start-no-agent--heuristic--offline--demo)
+
+**Reference**
+10. [Reading state from children](#reading-state-from-children)
+11. [API surface](#api-surface)
+12. [What goes in the design system](#what-goes-in-the-design-system)
+13. [Safety + scope](#safety--scope)
+14. [Local development](#local-development)
+
+**Project**
+15. [Migrating from v0.1](#migrating-from-v01)
+16. [Research lineages](#research-lineages)
+17. [Roadmap](#roadmap)
+18. [Contributing](#contributing)
+19. [License](#license)
+
+---
 
 ## Install once, ship adaptive UI
 
@@ -10,7 +45,7 @@ Today's UX cycle is slow: research → mock → ship → iterate. begeniux short
 npm install begeniux
 ```
 
-That's it. begeniux ships **both** halves — the React side (provider + tracker + engine) and a server-side LangGraph.js agent that runs in your existing Node backend (Next.js API route, Hono, Express, Cloudflare Workers — wherever).
+That's it. BeGeniux ships **both** halves — the React side (provider + tracker + engine) and a server-side LangGraph.js agent that runs in your existing Node backend (Next.js API route, Hono, Express, Cloudflare Workers — wherever).
 
 **Three lines of integration in any Next.js / Vite app:**
 
@@ -48,7 +83,7 @@ A complete runnable demo lives in [`examples/with-nextjs/`](./examples/with-next
 | **`begeniux/copilotkit`** | npm subpath | When your stack already runs on CopilotKit Runtime (e.g. the hackathon stack). |
 | **`begeniux-langgraph`** | PyPI · [`agent/`](./agent) | When your stack already runs on Python LangGraph (the hackathon's `apps/agent`). Reference Python implementation of the same agent — interchangeable with `begeniux/server`. |
 
-For 90% of consumers, just `begeniux` + `begeniux/server` is the canonical setup. The other two are for when you're already invested in a specific agent stack and want to plug begeniux in without forklifting your runtime.
+For 90% of consumers, just `begeniux` + `begeniux/server` is the canonical setup. The other two are for when you're already invested in a specific agent stack and want to plug BeGeniux in without forklifting your runtime.
 
 ---
 
@@ -67,7 +102,7 @@ This loop is slow because it optimizes the **average** user. Every individual ge
 
 ### Behavioral UI flips it
 
-Drop begeniux into your existing app and the loop becomes:
+Drop BeGeniux into your existing app and the loop becomes:
 
 1. The library tracks **any** user behavior — clicks, dwell, scroll, hovers, focus, form interactions, errors, rage clicks, custom events
 2. A LangGraph agent (running OpenAI / Gemini / Claude — your pick) reasons over the signal in real time
@@ -106,7 +141,7 @@ flowchart LR
     direction LR
     P["💬 Prompt"] --> M1["LLM"] --> U1["Generated UI<br/>from scratch"]
   end
-  subgraph Be["Behavioral UI · begeniux"]
+  subgraph Be["Behavioral UI · BeGeniux"]
     direction LR
     B["🖱️ Behavioral trace<br/>clicks · dwell · scroll<br/>hover · focus · errors · rage"] --> M2["LLM agent<br/>(LangGraph)"] --> U2["Live DOM mutation<br/>of your existing UI<br/>session-granular"]
   end
@@ -260,7 +295,7 @@ export default function App() {
 }
 ```
 
-The agent gets a frontend tool called `apply_adaptations`. Whenever it decides the UI should change, it calls the tool — begeniux applies the plan, the DOM shifts, the user sees a different UI without a reload.
+The agent gets a frontend tool called `apply_adaptations`. Whenever it decides the UI should change, it calls the tool — BeGeniux applies the plan, the DOM shifts, the user sees a different UI without a reload.
 
 ---
 
