@@ -6,6 +6,9 @@ dist
 .DS_Store
 examples/*/node_modules
 examples/*/dist
+examples/*/.next
+.next
+next-env.d.ts
 
 # Python
 __pycache__

@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Design tokens — these CSS variables ARE the agent's vocabulary. */
+:root {
+  --begen-accent: #7c3aed;
+  --begen-density: 16px;
+  --begen-emphasis: "balanced";
+  --begen-radius: 12px;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  background: #0b0c0f;
+  color: #f5f5f7;
+}
+
+/* Classes the agent can toggle. */
+.is-engaged main {
+  --begen-density: 10px;
+  --begen-radius: 6px;
+}
+.is-skimming main {
+  --begen-density: 22px;
+  --begen-radius: 16px;
+}
+.is-frustrated [data-begen-id="cta"] {
+  --begen-accent: #ef4444;
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}

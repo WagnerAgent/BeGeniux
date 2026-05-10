@@ -4,30 +4,51 @@
 
 Today's UX cycle is slow: research → mock → ship → iterate. begeniux short-circuits it: install the library on an existing app, the agent observes how each user actually behaves, and the UI re-shapes itself live to match — accent colors, density, emphasis, microcopy. No variants pre-baked. No design committee. Personalization happens *during the session*.
 
-## Two packages, one product
-
-| Package | Where | What |
-|---|---|---|
-| **`begeniux`** | npm | React side — provider, behavior tracker, AdaptationEngine, CopilotKit adapter |
-| **`begeniux-langgraph`** | PyPI · [`agent/`](./agent) | Agent side — LangGraph node with the begeniux adaptive UI policy, runs Gemini or Claude |
-
-Both ship from this repo, versioned together. The agent isn't optional infrastructure — it's the brain. Install both for the canonical setup:
+## Install once, ship adaptive UI
 
 ```bash
-npm install begeniux                  # browser side
-pip install begeniux-langgraph        # agent side (or pip install "begeniux-langgraph[claude]")
+npm install begeniux
 ```
+
+That's it. begeniux ships **both** halves — the React side (provider + tracker + engine) and a server-side LangGraph.js agent that runs in your existing Node backend (Next.js API route, Hono, Express, Cloudflare Workers — wherever).
+
+**Three lines of integration in any Next.js / Vite app:**
 
 ```tsx
-<CopilotKitProvider runtimeUrl="/api/copilotkit">
-  <BeGenProvider designSystem={designSystem} pageContext={{ route: "/" }}>
-    <CopilotKitAdapter />
-    <App />              {/* unmodified existing app */}
-  </BeGenProvider>
-</CopilotKitProvider>
+// 1. app/api/begen/route.ts (Next.js API route)
+import { createBeGenHandler } from "begeniux/server";
+export const POST = createBeGenHandler({ apiKey: process.env.GEMINI_API_KEY! });
+
+// 2. app/providers.tsx
+"use client";
+import { BeGenProvider, createHttpAdapter } from "begeniux";
+const designSystem = { cssVariables: { "--accent": {...}, "--density": {...} }, classes: { ... } };
+export function Providers({ children }) {
+  return (
+    <BeGenProvider designSystem={designSystem} pageContext={{ route: "/" }}
+                   classify={createHttpAdapter({ url: "/api/begen" })}>
+      {children}
+    </BeGenProvider>
+  );
+}
+
+// 3. add data-begen-id="..." to elements you want the agent to be able to target
 ```
 
-That's the whole integration. The library tracks behavior universally, hands a behavior summary + your design system + a DOM snapshot to your LangGraph (or any) agent, and applies the agent's `apply_adaptations` tool calls to the live DOM with full reversibility.
+Set `GEMINI_API_KEY` (or `ANTHROPIC_API_KEY`) and you're done. Behavior signals get captured, sent to the LangGraph agent server-side, the agent reasons over them with Gemini/Claude, and the DOM mutates live.
+
+A complete runnable demo lives in [`examples/with-nextjs/`](./examples/with-nextjs/).
+
+## Packaging
+
+| Package | Where | When to use |
+|---|---|---|
+| **`begeniux`** (main) | npm | Always. Provider, tracker, engine, types, HTTP adapter. |
+| **`begeniux/server`** | npm subpath | When you have a Node backend (Next.js / Vite + Express / Hono / Cloudflare). LangGraph.js agent. **The default canonical path.** |
+| **`begeniux/copilotkit`** | npm subpath | When your stack already runs on CopilotKit Runtime (e.g. the hackathon stack). |
+| **`begeniux-langgraph`** | PyPI · [`agent/`](./agent) | When your stack already runs on Python LangGraph (the hackathon's `apps/agent`). Reference Python implementation of the same agent — interchangeable with `begeniux/server`. |
+
+For 90% of consumers, just `begeniux` + `begeniux/server` is the canonical setup. The other two are for when you're already invested in a specific agent stack and want to plug begeniux in without forklifting your runtime.
 
 ---
 
