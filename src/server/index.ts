@@ -27,9 +27,9 @@ import {
 export type CreateBeGenAgentOpts = {
   /** API key for whichever provider you pick. Always read from env on the server. */
   apiKey: string;
-  /** Default "gemini". Set to "anthropic" to use Claude (requires @langchain/anthropic). */
+  /** Default "openai". Switch to "gemini" or "anthropic" for those models. */
   provider?: ProviderName;
-  /** Model id. Defaults: "gemini-2.0-flash" for gemini, "claude-sonnet-4-5-20250929" for anthropic. */
+  /** Model id. Defaults: "gpt-4o-mini" (openai), "gemini-2.0-flash" (gemini), "claude-sonnet-4-5-20250929" (anthropic). */
   model?: string;
   /** 0–1; default 0.2. Lower = more deterministic. */
   temperature?: number;
@@ -37,6 +37,8 @@ export type CreateBeGenAgentOpts = {
   systemPrompt?: string;
   /** Append to the canonical system prompt instead of replacing. */
   extraInstructions?: string;
+  /** Optional OpenAI-compatible base URL (Azure, OpenRouter, local proxy, …). */
+  baseUrl?: string;
 };
 
 const FALLBACK_PLAN: AdaptationPlan = {
@@ -120,6 +122,7 @@ async function buildAgent(opts: CreateBeGenAgentOpts) {
     model: opts.model,
     apiKey: opts.apiKey,
     temperature: opts.temperature,
+    baseUrl: opts.baseUrl,
   });
 
   const { tool } = await import("@langchain/core/tools");

@@ -16,6 +16,7 @@ export default defineConfig({
     "zod",
     "@langchain/core",
     "@langchain/langgraph",
+    "@langchain/openai",
     "@langchain/google-genai",
     "@langchain/anthropic",
   ],

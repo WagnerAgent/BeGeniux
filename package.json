@@ -40,29 +40,19 @@
     "@langchain/core": ">=1.0.0",
     "@langchain/google-genai": ">=2.0.0",
     "@langchain/langgraph": ">=1.0.0",
+    "@langchain/openai": ">=1.0.0",
     "react": ">=18",
     "react-dom": ">=18",
     "zod": ">=3"
   },
   "peerDependenciesMeta": {
-    "@copilotkit/react-core": {
-      "optional": true
-    },
-    "zod": {
-      "optional": true
-    },
-    "@langchain/core": {
-      "optional": true
-    },
-    "@langchain/langgraph": {
-      "optional": true
-    },
-    "@langchain/google-genai": {
-      "optional": true
-    },
-    "@langchain/anthropic": {
-      "optional": true
-    }
+    "@copilotkit/react-core": { "optional": true },
+    "zod": { "optional": true },
+    "@langchain/core": { "optional": true },
+    "@langchain/langgraph": { "optional": true },
+    "@langchain/openai": { "optional": true },
+    "@langchain/google-genai": { "optional": true },
+    "@langchain/anthropic": { "optional": true }
   },
   "devDependencies": {
     "@copilotkit/react-core": "latest",
@@ -70,6 +60,7 @@
     "@langchain/core": "^1.1.45",
     "@langchain/google-genai": "^2.1.30",
     "@langchain/langgraph": "^1.3.0",
+    "@langchain/openai": "^1.4.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "react": "^18.3.1",
